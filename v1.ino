@@ -280,6 +280,11 @@ void printMenuData() {
 // ===============================================================================
 
 void saveData(int data[], int arraySize) {
+    lcd.clear();
+    lcd.print("Guardando");
+    lcd.setCursor(0, 1);
+    lcd.print("configuracion...");
+
     for (int i = 0; i < arraySize; i++) {
         EEPROM.write(i, menuData[i]);
     }
