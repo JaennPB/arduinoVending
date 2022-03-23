@@ -179,7 +179,7 @@ void loop() {
     // enter menu
     if (enterOrSaveButton.getCount() == 3 && !insideMenu) {
         detachInterrupt(digitalPinToInterrupt(coinPin));
-        
+
         insideMenu = true;
         enterOrSaveButton.resetCount();
         printMenuSeconds();
@@ -315,7 +315,7 @@ void runPump(int pin1, int pin2, int time) {
     delay(3000);
 
     lcd.clear();
-    lcd.print("Despachando");
+    lcd.print("Cargando");
     lcd.setCursor(0, 1);
     lcd.print("producto...");
 
