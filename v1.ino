@@ -1,6 +1,3 @@
-// TODO: while runPump is running, coin acceptor, buttons and menu should stop working
-// TODO: while insideMenu, coin acceptor and buttons should stop working
-
 // ======================================================= libraries
 // =================================================================
 
@@ -181,6 +178,8 @@ void loop() {
 
     // enter menu
     if (enterOrSaveButton.getCount() == 3 && !insideMenu) {
+        detachInterrupt(digitalPinToInterrupt(coinPin));
+        
         insideMenu = true;
         enterOrSaveButton.resetCount();
         printMenuSeconds();
@@ -303,6 +302,8 @@ void readData(int arraySize) {
 // =========================================================================
 
 void runPump(int pin1, int pin2, int time) {
+    detachInterrupt(digitalPinToInterrupt(coinPin));
+
     totalAmount = 0;
     const int pumpTimeInMillis = time * 1000;
 
