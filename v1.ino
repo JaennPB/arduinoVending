@@ -37,8 +37,6 @@ ezButton button4(35);
 ezButton button5(33);
 ezButton button6(31);
 
-boolean pumpIsRunning = false;
-
 // ----------------------------- L298N driver
 
 const int in1Pin = 22;
@@ -213,27 +211,33 @@ void loop() {
     // ------------------------------------------
 
     if (button1.isPressed() && totalAmount >= menuData[6]) {
-        runPump(in1Pin, in2Pin, menuData[0]);
+        runPump(in1Pin, in2Pin, menuData[0], menuData[6]);
+        return;
     }
 
     if (button2.isPressed() && totalAmount >= menuData[7]) {
-        runPump(in3Pin, in4Pin, menuData[1]);
+        runPump(in3Pin, in4Pin, menuData[1], menuData[7]);
+        return;
     }
 
     if (button3.isPressed() && totalAmount >= menuData[8]) {
-        runPump(in5Pin, in6Pin, menuData[2]);
+        runPump(in5Pin, in6Pin, menuData[2], menuData[8]);
+        return;
     }
 
     if (button4.isPressed() && totalAmount >= menuData[9]) {
-        runPump(in7Pin, in8Pin, menuData[3]);
+        runPump(in7Pin, in8Pin, menuData[3], menuData[9]);
+        return;
     }
 
     if (button5.isPressed() && totalAmount >= menuData[10]) {
-        runPump(in9Pin, in10Pin, menuData[4]);
+        runPump(in9Pin, in10Pin, menuData[4], menuData[10]);
+        return;
     }
 
     if (button6.isPressed() && totalAmount >= menuData[11]) {
-        runPump(in11Pin, in12Pin, menuData[5]);
+        runPump(in11Pin, in12Pin, menuData[5], menuData[11]);
+        return;
     }
 }
 
@@ -306,10 +310,9 @@ void readData(int arraySize) {
 // ======================================================= run pump function
 // =========================================================================
 
-void runPump(int pin1, int pin2, int time) {
+void runPump(int pin1, int pin2, int time, int price) {
     detachInterrupt(digitalPinToInterrupt(coinPin));
-
-    totalAmount = 0;
+    totalAmount = totalAmount - price;
     const int pumpTimeInMillis = time * 1000;
 
     lcd.clear();
@@ -339,5 +342,17 @@ void runPump(int pin1, int pin2, int time) {
 
     delay(3000);
 
-    resetFunc();
+    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
+    firstCoin = true;
+
+    if (totalAmount == 0) {
+        lcd.clear();
+        lcd.print("Bienvenido!");
+        lcd.setCursor(0, 1);
+        lcd.print("Inserte monedas.");
+    } else if (totalAmount > 0) {
+        coinIn = true;
+    }
+
+    return;
 }
