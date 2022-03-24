@@ -70,7 +70,6 @@ void(* resetFunc) (void) = 0;
 // ==============================================================
 
 void setup() {
-
     // ----------------------------- read data on startup
 
     readData(12);
@@ -86,15 +85,6 @@ void setup() {
     plusButton.setDebounceTime(50);
     nextButton.setDebounceTime(50);
     enterOrSaveButton.setDebounceTime(50);
-
-    // ----------------------------- pumps
-
-    button1.setDebounceTime(100);
-    button2.setDebounceTime(100);
-    button3.setDebounceTime(100);
-    button4.setDebounceTime(100);
-    button5.setDebounceTime(100);
-    button6.setDebounceTime(100);
 
     // ----------------------------- L298N driver
 
