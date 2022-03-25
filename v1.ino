@@ -110,9 +110,21 @@ void setup() {
 
     lcd.init();
     lcd.backlight();
+
+    delay(2000);
+
+    lcd.print("Maquinas vending");
+    lcd.setCursor(0, 1);
+    lcd.print("ROME");
+
+    delay(3000);
+
+    lcd.clear();
     lcd.print("Bienvenido!");
     lcd.setCursor(0, 1);
     lcd.print("Inserte monedas.");
+
+    totalAmount = 0;
 }
 
 // ======================================================= loop
@@ -215,13 +227,13 @@ void loop() {
         return;
     }
 
-    if (button4.isPressed() && totalAmount >= menuData[9]) {
-        runPump(in7Pin, in8Pin, menuData[3], menuData[9]);
+    if (button4.isPressed() && totalAmount >= menuData[10]) {
+        runPump(in9Pin, in10Pin, menuData[4], menuData[10]);
         return;
     }
 
-    if (button5.isPressed() && totalAmount >= menuData[10]) {
-        runPump(in9Pin, in10Pin, menuData[4], menuData[10]);
+    if (button5.isPressed() && totalAmount >= menuData[9]) {
+        runPump(in7Pin, in8Pin, menuData[3], menuData[9]);
         return;
     }
 
