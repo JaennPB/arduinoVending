@@ -121,8 +121,8 @@ void setup() {
 
     pinMode(coinPin, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    totalAmount = 0;
     coinIn = false;
+    totalAmount = 0;
 }
 
 // ======================================================= loop
@@ -336,7 +336,7 @@ void readData(int arraySize) {
 
 void runPump(int pin1, int pin2, int time, int price) {
     detachInterrupt(digitalPinToInterrupt(coinPin));
-    totalAmount = totalAmount - price;
+    totalAmount = 0;
     const int pumpTimeInMillis = time * 1000;
 
     lcd.clear();
@@ -366,18 +366,5 @@ void runPump(int pin1, int pin2, int time, int price) {
 
     delay(3000);
 
-    // coin reset
-    if (totalAmount == 0) {
-        lcd.clear();
-        lcd.print("Bienvenido!");
-        lcd.setCursor(0, 1);
-        lcd.print("Inserte monedas.");
-    } else if (totalAmount > 0) {
-        coinIn = true;
-    }
-
-    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    firstCoin = true;
-
-    return;
+    resetFunc();
 }
