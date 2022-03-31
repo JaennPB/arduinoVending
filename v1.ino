@@ -180,16 +180,16 @@ void loop() {
 
         insideMenu = true;
         enterOrSaveButton.resetCount();
-        printMenuSeconds();
+        printSecondsScreen();
     }
 
     // move in menu
     if (insideMenu && nextButton.isPressed() && currentScreen < 11) {
         currentScreen++;
         if (currentScreen < 6) {
-            printMenuSeconds();
+            printSecondsScreen();
         } else if (currentScreen > 5) {
-            printMenuPrices();
+            printPricesScreen();
         }
     }
 
@@ -197,17 +197,17 @@ void loop() {
     if (insideMenu && minusButton.isPressed() && menuData[currentScreen] > 1) {
         menuData[currentScreen]--;
         if (currentScreen < 6) {
-            printMenuSecondsData();
+            printSecondsData();
         } else if (currentScreen > 5) {
-            printMenuPricesData();
+            printPricesData();
         }
         
     } else if (insideMenu && plusButton.isPressed() && menuData[currentScreen] < 99) {
         menuData[currentScreen]++;
         if (currentScreen < 6) {
-            printMenuSecondsData();
+            printSecondsData();
         } else if (currentScreen > 5) {
-            printMenuPricesData();
+            printPricesData();
         }
     }
 
@@ -261,7 +261,7 @@ void updateCredit() {
 // ======================================================= menu functions
 // ======================================================================
 
-void printMenuSeconds() {
+void printSecondsScreen() {
     currentProductS++;
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -272,7 +272,7 @@ void printMenuSeconds() {
     lcd.print(" segundos");
 }
 
-void printMenuPrices() {
+void printPricesScreen() {
     currentProductP++;
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -284,7 +284,7 @@ void printMenuPrices() {
 
 }
 
-void printMenuPricesData() {
+void printPricesData() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Precio P");
@@ -295,7 +295,7 @@ void printMenuPricesData() {
 
 }
 
-void printMenuSecondsData() {
+void printSecondsData() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Segundos P");
@@ -303,12 +303,6 @@ void printMenuSecondsData() {
     lcd.setCursor(0, 1);
     lcd.print(menuData[currentScreen]);
     lcd.print(" segundos");
-}
-
-void printMenuData() {
-    lcd.setCursor(0, 1);
-    lcd.print(menuData[currentScreen]);
-    lcd.print(" ");
 }
 
 // ======================================================= save and read functions
