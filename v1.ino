@@ -62,6 +62,10 @@ const int in12Pin = 44;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+// ----------------------------- lcd display
+
+int timesRun = 0;
+
 // ======================================================= reset helper
 // ====================================================================
 
@@ -336,7 +340,10 @@ void readData(int arraySize) {
 
 void runPump(int pin1, int pin2, int time, int price) {
     detachInterrupt(digitalPinToInterrupt(coinPin));
-    totalAmount = 0;
+
+    totalAmount = totalAmount - price;
+    timesRun++;
+
     const int pumpTimeInMillis = time * 1000;
 
     lcd.clear();
@@ -366,5 +373,30 @@ void runPump(int pin1, int pin2, int time, int price) {
 
     delay(3000);
 
-    resetFunc();
+    // reset after pumps run 3 times
+    if (timesRun > 2 && totalAmount == 0) {
+        lcd.clear();
+        lcd.print("Reiniciando");
+        lcd.setCursor(0, 1);
+        lcd.print("espere...");
+
+        delay(3000);
+
+        resetFunc();
+    }
+
+    // coin reset
+    if (totalAmount == 0) {
+        lcd.clear();
+        lcd.print("Bienvenido!");
+        lcd.setCursor(0, 1);
+        lcd.print("Inserte monedas.");
+    } else if (totalAmount > 0) {
+        coinIn = true;
+    }
+
+    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
+    firstCoin = true;
+
+    return;
 }
