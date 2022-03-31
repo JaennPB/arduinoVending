@@ -121,8 +121,8 @@ void setup() {
 
     pinMode(coinPin, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    coinIn = false;
     totalAmount = 0;
+    coinIn = false;
 }
 
 // ======================================================= loop
