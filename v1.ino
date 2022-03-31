@@ -30,12 +30,13 @@ boolean insideMenu = false;
 
 // ----------------------------- pumps
 
-ezButton button1(41);
-ezButton button2(39);
-ezButton button3(37);
-ezButton button4(35);
-ezButton button5(33);
-ezButton button6(31);
+//TODO: change on a new arduino
+ezButton button1(39);
+ezButton button2(37);
+ezButton button3(35);
+ezButton button4(33);
+ezButton button5(31);
+ezButton button6(29);
 
 // ----------------------------- L298N driver
 
@@ -74,11 +75,6 @@ void setup() {
 
     readData(12);
 
-    // ----------------------------- coin setup
-
-    pinMode(coinPin, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-
     // ----------------------------- menu module
 
     minusButton.setDebounceTime(50);
@@ -110,9 +106,6 @@ void setup() {
 
     lcd.init();
     lcd.backlight();
-
-    delay(2000);
-
     lcd.print("Maquinas vending");
     lcd.setCursor(0, 1);
     lcd.print("ROME");
@@ -124,7 +117,12 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("Inserte monedas.");
 
+    // ----------------------------- coin setup
+
+    pinMode(coinPin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
     totalAmount = 0;
+    coinIn = false;
 }
 
 // ======================================================= loop
@@ -198,15 +196,24 @@ void loop() {
     // add or subtract data
     if (insideMenu && minusButton.isPressed() && menuData[currentScreen] > 1) {
         menuData[currentScreen]--;
-        printMenuData();
-    } else if (insideMenu && plusButton.isPressed() && menuData[currentScreen] < 51) {
+        if (currentScreen < 6) {
+            printMenuSecondsData();
+        } else if (currentScreen > 5) {
+            printMenuPricesData();
+        }
+        
+    } else if (insideMenu && plusButton.isPressed() && menuData[currentScreen] < 99) {
         menuData[currentScreen]++;
-        printMenuData();
+        if (currentScreen < 6) {
+            printMenuSecondsData();
+        } else if (currentScreen > 5) {
+            printMenuPricesData();
+        }
     }
 
     // save and reset
     if (enterOrSaveButton.getCount() == 1 && insideMenu) {
-        saveData(menuData, 12);
+        saveData(menuData, 12); 
     }
 
     // ----------------------------- buttons loop
@@ -277,9 +284,31 @@ void printMenuPrices() {
 
 }
 
+void printMenuPricesData() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Precio P");
+    lcd.print(currentProductP);
+    lcd.setCursor(0, 1);
+    lcd.print(menuData[currentScreen]);
+    lcd.print(" pesos");
+
+}
+
+void printMenuSecondsData() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Segundos P");
+    lcd.print(currentProductS);
+    lcd.setCursor(0, 1);
+    lcd.print(menuData[currentScreen]);
+    lcd.print(" segundos");
+}
+
 void printMenuData() {
     lcd.setCursor(0, 1);
     lcd.print(menuData[currentScreen]);
+    lcd.print(" ");
 }
 
 // ======================================================= save and read functions
@@ -301,8 +330,7 @@ void saveData(int data[], int arraySize) {
 }
 
 void readData(int arraySize) {
-    //TODO: change to 0 on new arduino
-    if (EEPROM.read(2) != 0xff) {
+    if (EEPROM.read(0) != 0xff) {
         for (int i = 0; i < arraySize; i++) {
             menuData[i] = EEPROM.read(i);
         }
@@ -344,9 +372,7 @@ void runPump(int pin1, int pin2, int time, int price) {
 
     delay(3000);
 
-    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    firstCoin = true;
-
+    // coin reset
     if (totalAmount == 0) {
         lcd.clear();
         lcd.print("Bienvenido!");
@@ -355,6 +381,9 @@ void runPump(int pin1, int pin2, int time, int price) {
     } else if (totalAmount > 0) {
         coinIn = true;
     }
+
+    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
+    firstCoin = true;
 
     return;
 }
