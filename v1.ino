@@ -22,7 +22,7 @@ ezButton plusButton(51);
 ezButton nextButton(49);
 ezButton enterOrSaveButton(47);
 
-int menuData[12] = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+byte menuData[12] = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
 int currentProductS = 0;
 int currentProductP = 0;
 int currentScreen;
@@ -30,13 +30,12 @@ boolean insideMenu = false;
 
 // ----------------------------- pumps
 
-//TODO: change on a new arduino
-ezButton button1(39);
-ezButton button2(37);
-ezButton button3(35);
-ezButton button4(33);
-ezButton button5(31);
-ezButton button6(29);
+ezButton button1(41);
+ezButton button2(39);
+ezButton button3(37);
+ezButton button4(35);
+ezButton button5(33);
+ezButton button6(31);
 
 // ----------------------------- L298N driver
 
@@ -61,10 +60,6 @@ const int in12Pin = 44;
 // ----------------------------- lcd display
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-// ----------------------------- lcd display
-
-int timesRun = 0;
 
 // ======================================================= reset helper
 // ====================================================================
@@ -105,7 +100,14 @@ void setup() {
 
     pinMode(in11Pin, OUTPUT);
     pinMode(in12Pin, OUTPUT);
-   
+
+    // ----------------------------- coin setup
+
+    pinMode(coinPin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, RISING);
+    totalAmount = 0;
+    coinIn = false;
+
     // ----------------------------- init display
 
     lcd.init();
@@ -120,13 +122,6 @@ void setup() {
     lcd.print("Bienvenido!");
     lcd.setCursor(0, 1);
     lcd.print("Inserte monedas.");
-
-    // ----------------------------- coin setup
-
-    pinMode(coinPin, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    totalAmount = 0;
-    coinIn = false;
 }
 
 // ======================================================= loop
@@ -224,32 +219,32 @@ void loop() {
     // ------------------------------------------
 
     if (button1.isPressed() && totalAmount >= menuData[6]) {
-        runPump(in1Pin, in2Pin, menuData[0], menuData[6]);
+        runPump(in1Pin, in2Pin, menuData[0]);
         return;
     }
 
     if (button2.isPressed() && totalAmount >= menuData[7]) {
-        runPump(in3Pin, in4Pin, menuData[1], menuData[7]);
+        runPump(in3Pin, in4Pin, menuData[1]);
         return;
     }
 
     if (button3.isPressed() && totalAmount >= menuData[8]) {
-        runPump(in5Pin, in6Pin, menuData[2], menuData[8]);
+        runPump(in5Pin, in6Pin, menuData[2]);
         return;
     }
 
-    if (button4.isPressed() && totalAmount >= menuData[10]) {
-        runPump(in9Pin, in10Pin, menuData[4], menuData[10]);
+    if (button4.isPressed() && totalAmount >= menuData[9]) {
+        runPump(in7Pin, in8Pin, menuData[3]);
         return;
     }
 
-    if (button5.isPressed() && totalAmount >= menuData[9]) {
-        runPump(in7Pin, in8Pin, menuData[3], menuData[9]);
+    if (button5.isPressed() && totalAmount >= menuData[10]) {
+        runPump(in9Pin, in10Pin, menuData[4]);
         return;
     }
 
     if (button6.isPressed() && totalAmount >= menuData[11]) {
-        runPump(in11Pin, in12Pin, menuData[5], menuData[11]);
+        runPump(in11Pin, in12Pin, menuData[5]);
         return;
     }
 }
@@ -312,7 +307,7 @@ void printSecondsData() {
 // ======================================================= save and read functions
 // ===============================================================================
 
-void saveData(int data[], int arraySize) {
+void saveData(byte data[], int arraySize) {
     lcd.clear();
     lcd.print("Guardando");
     lcd.setCursor(0, 1);
@@ -338,13 +333,11 @@ void readData(int arraySize) {
 // ======================================================= run pump function
 // =========================================================================
 
-void runPump(int pin1, int pin2, int time, int price) {
+void runPump(int pin1, int pin2, byte time) {
     detachInterrupt(digitalPinToInterrupt(coinPin));
-
-    totalAmount = totalAmount - price;
-    timesRun++;
-
-    const int pumpTimeInMillis = time * 1000;
+    totalAmount = 0;
+    
+    byte halfTime = time / 2;
 
     lcd.clear();
     lcd.print("Coloque su");
@@ -361,7 +354,8 @@ void runPump(int pin1, int pin2, int time, int price) {
     digitalWrite(pin1, HIGH);
     digitalWrite(pin2, LOW);
 
-    delay(pumpTimeInMillis);
+    delay(halfTime * 1000);
+    delay(halfTime * 1000);
 
     digitalWrite(pin1, LOW);
     digitalWrite(pin2, LOW);
@@ -373,30 +367,5 @@ void runPump(int pin1, int pin2, int time, int price) {
 
     delay(3000);
 
-    // reset after pumps run 3 times
-    if (timesRun > 2 && totalAmount == 0) {
-        lcd.clear();
-        lcd.print("Reiniciando");
-        lcd.setCursor(0, 1);
-        lcd.print("espere...");
-
-        delay(3000);
-
-        resetFunc();
-    }
-
-    // coin reset
-    if (totalAmount == 0) {
-        lcd.clear();
-        lcd.print("Bienvenido!");
-        lcd.setCursor(0, 1);
-        lcd.print("Inserte monedas.");
-    } else if (totalAmount > 0) {
-        coinIn = true;
-    }
-
-    attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, FALLING);
-    firstCoin = true;
-
-    return;
+    resetFunc();
 }
