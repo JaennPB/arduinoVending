@@ -15,11 +15,6 @@ boolean firstCoin = true;
 boolean coinIn = false;
 volatile int totalAmount = 0;
 
-// ----------------------------- timer
-
-unsigned long timer = 0;
-bool timerRunning = false;
-
 // ----------------------------- menu module
 
 ezButton minusButton(53);
@@ -224,43 +219,33 @@ void loop() {
     // ------------------------------------------
 
     if (button1.isPressed() && totalAmount >= menuData[6]) {
-        runPump(in1Pin, in2Pin, menuData[0], menuData[6]);
+        runPump(in1Pin, in2Pin, menuData[0]);
         return;
     }
 
     if (button2.isPressed() && totalAmount >= menuData[7]) {
-        runPump(in3Pin, in4Pin, menuData[1], menuData[7]);
+        runPump(in3Pin, in4Pin, menuData[1]);
         return;
     }
 
     if (button3.isPressed() && totalAmount >= menuData[8]) {
-        runPump(in5Pin, in6Pin, menuData[2], menuData[8]);
+        runPump(in5Pin, in6Pin, menuData[2]);
         return;
     }
 
     if (button4.isPressed() && totalAmount >= menuData[9]) {
-        runPump(in7Pin, in8Pin, menuData[3], menuData[9]);
+        runPump(in7Pin, in8Pin, menuData[3]);
         return;
     }
 
     if (button5.isPressed() && totalAmount >= menuData[10]) {
-        runPump(in9Pin, in10Pin, menuData[4], menuData[10]);
+        runPump(in9Pin, in10Pin, menuData[4]);
         return;
     }
 
     if (button6.isPressed() && totalAmount >= menuData[11]) {
-        runPump(in11Pin, in12Pin, menuData[5], menuData[11]);
+        runPump(in11Pin, in12Pin, menuData[5]);
         return;
-    }
-
-
-    if (timerRunning && ((millis() - timer) >= 30000)) {
-        lcd.clear();
-        lcd.print("Tiempo terminado");
-
-        delay(3000);
-
-        resetFunc();
     }
 }
 
@@ -270,9 +255,6 @@ void loop() {
 void updateCredit() {
     totalAmount++;
     coinIn = true;
-
-    timer = millis();
-    timerRunning = true;
 }
 
 // ======================================================= menu functions
@@ -351,9 +333,9 @@ void readData(int arraySize) {
 // ======================================================= run pump function
 // =========================================================================
 
-void runPump(int pin1, int pin2, byte time, byte price) {
+void runPump(int pin1, int pin2, byte time) {
     detachInterrupt(digitalPinToInterrupt(coinPin));
-    totalAmount = totalAmount - price;
+    totalAmount = 0;
     
     byte halfTime = time / 2;
 
@@ -385,22 +367,5 @@ void runPump(int pin1, int pin2, byte time, byte price) {
 
     delay(3000);
 
-    if (totalAmount == 0) {
-        resetFunc();
-    }
-
-    if (totalAmount > 0) {
-        timer = millis();
-        timerRunning = true;
-
-        lcd.clear();
-        lcd.print("Su credito:");
-        lcd.setCursor(0, 1);
-        lcd.print("$");
-        lcd.print(totalAmount);
-        lcd.print(" pesos");
-
-        attachInterrupt(digitalPinToInterrupt(coinPin), updateCredit, RISING);
-        coinIn = false;
-    }
+    resetFunc();
 }
